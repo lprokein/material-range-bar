@@ -33,6 +33,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -135,10 +136,6 @@ public class RangeBar extends View {
     // setTickCount only resets indices before a thumb has been pressed or a
     // setThumbIndices() is called, to correspond with intended usage
     private boolean mFirstSetTickCount = true;
-
-    private int mDefaultWidth = 500;
-
-    private int mDefaultHeight = 150;
 
     private int mTickCount = (int) ((mTickEnd - mTickStart) / mTickInterval) + 1;
 
@@ -309,6 +306,9 @@ public class RangeBar extends View {
         final int measureHeightMode = MeasureSpec.getMode(heightMeasureSpec);
         final int measureWidth = MeasureSpec.getSize(widthMeasureSpec);
         final int measureHeight = MeasureSpec.getSize(heightMeasureSpec);
+        DisplayMetrics mDisplayMetrices = getContext().getResources().getDisplayMetrics();
+        int mDefaultWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, mDisplayMetrices);
+        int mDefaultHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75, mDisplayMetrices);
 
         // The RangeBar width should be as large as possible.
         if (measureWidthMode == MeasureSpec.AT_MOST) {
@@ -1274,11 +1274,9 @@ public class RangeBar extends View {
             float leftThumbXDistance = mIsRangeBar ? Math.abs(mLeftThumb.getX() - x) : 0;
             float rightThumbXDistance = Math.abs(mRightThumb.getX() - x);
 
-            if (leftThumbXDistance < rightThumbXDistance) {
-                if (mIsRangeBar) {
-                    movePin(mLeftThumb, x);
-                    releasePin(mLeftThumb);
-                }
+            if (!mIsRangeBar || leftThumbXDistance < rightThumbXDistance) {
+                movePin(mLeftThumb, x);
+                releasePin(mLeftThumb);
             } else {
                 movePin(mRightThumb, x);
                 releasePin(mRightThumb);
